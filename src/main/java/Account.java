@@ -19,9 +19,8 @@ public class Account {
         if (amount > 0 && balance - amount >= 0) {
             balance -= amount;
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
