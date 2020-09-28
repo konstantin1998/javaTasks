@@ -5,16 +5,24 @@ public class Transaction {
     private final double amount;
     private final Account originator;
     private final Account beneficiary;
-    private boolean executed;
-    private boolean rolledBack;
+    private final boolean executed;
+    private final boolean rolledBack;
 
-    Transaction(long id, double amount, Account originated, Account beneficiary){
+    Transaction(long id, double amount, Account originator, Account beneficiary){
         this.id = id;
         this.amount = amount;
-        this.originator = originated;
+        this.originator = originator;
         this.beneficiary = beneficiary;
         this.executed = false;
         this.rolledBack = false;
+    }
+    private Transaction(long id, double amount, Account originator, Account beneficiary, boolean executed, boolean rolledBack){
+        this.id = id;
+        this.amount = amount;
+        this.originator = originator;
+        this.beneficiary = beneficiary;
+        this.executed = executed;
+        this.rolledBack = rolledBack;
     }
     /**
      * Adding entries to both accounts
@@ -24,10 +32,10 @@ public class Transaction {
         if (executed) {
             throw new IllegalStateException("transaction is already executed");
         }
-        executed = true;
+        //executed = true;
         originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now()));
         beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now()));
-        return this;
+        return new Transaction(id, amount, originator, beneficiary, true, false);
     }
 
     /**
@@ -39,10 +47,14 @@ public class Transaction {
         if (rolledBack) {
             throw new IllegalStateException("transaction is already rolled back");
         }
-        rolledBack = true;
+        //rolledBack = true;
         originator.addEntry(new Entry(beneficiary, this, -1 * amount, LocalDateTime.now()));
         beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now()));
-        return this;
+        return new Transaction(id, amount, originator, beneficiary, true, false);
+    }
+
+    Account getBeneficiary() {
+        return this.beneficiary;
     }
 }
 
