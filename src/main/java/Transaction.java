@@ -50,7 +50,7 @@ public class Transaction {
         //rolledBack = true;
         originator.addEntry(new Entry(beneficiary, this, -1 * amount, LocalDateTime.now()));
         beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now()));
-        return new Transaction(id, amount, originator, beneficiary, true, false);
+        return new Transaction(id, amount, originator, beneficiary, true, true);
     }
 
     Account getBeneficiary() {

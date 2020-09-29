@@ -3,7 +3,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collection;
 import java.time.*;
 
-public class EntryTest {
+public class EntriesTest {
     @Test
     void betweenDatesReturnsEntriesBetweenGivenDates() {
         //given

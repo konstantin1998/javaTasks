@@ -20,25 +20,19 @@ public class TransactionManager {
     public Transaction createTransaction(double amount, Account originator, Account beneficiary) {
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         id++;
-        //transaction = transaction.execute();
-        //add(beneficiary, transaction);
         return transaction;
     }
 
     public Collection<Transaction> findAllTransactionsByAccount(Account account) {
-        // write your code here
         return (Collection<Transaction>)transactions.get(account);
     }
 
-
     public void rollbackTransaction(Transaction transaction) {
-        // write your code here
         Transaction rolledBackTansaction = transaction.rollback();
         add(rolledBackTansaction);
     }
 
     public void executeTransaction(Transaction transaction) {
-        // write your code here
         Transaction executedTransaction = transaction.execute();
         add(executedTransaction);
     }
