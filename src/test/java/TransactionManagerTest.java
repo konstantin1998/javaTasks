@@ -9,30 +9,29 @@ public class TransactionManagerTest {
         //given
         double amount = 0;
         long accountId = 0;
-        Account originator = new Account(accountId, new TransactionManager());
-        Account beneficiary1 = new Account(accountId, new TransactionManager());
-        Account beneficiary2 = new Account(accountId, new TransactionManager());
-        Account beneficiary3 = new Account(accountId, new TransactionManager());
+        TransactionManager transactionManager = new TransactionManager();
+        Account beneficiary = new Account(accountId, transactionManager);
+        Account originator1 = new Account(accountId, transactionManager);
+        Account originator2 = new Account(accountId, transactionManager);
+        Account originator3 = new Account(accountId, transactionManager);
 
         int k = 5;
         int l = 10;
         int n = 15;
 
-        TransactionManager transactionManager = new TransactionManager();
-
         for (int i = 0; i <= k - 1; i++) {
-            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator, beneficiary1));
+            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator1, beneficiary));
         }
         for (int i = 0; i <= l - 1; i++) {
-            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator, beneficiary2));
+            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator2, beneficiary));
         }
         for (int i = 0; i <= n - 1; i++) {
-            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator, beneficiary3));
+            transactionManager.executeTransaction(transactionManager.createTransaction(amount, originator3, beneficiary));
         }
 
-        Collection<Transaction> transactions1 = transactionManager.findAllTransactionsByAccount(beneficiary1);
-        Collection<Transaction> transactions2 = transactionManager.findAllTransactionsByAccount(beneficiary2);
-        Collection<Transaction> transactions3 = transactionManager.findAllTransactionsByAccount(beneficiary3);
+        Collection<Transaction> transactions1 = transactionManager.findAllTransactionsByAccount(originator1);
+        Collection<Transaction> transactions2 = transactionManager.findAllTransactionsByAccount(originator2);
+        Collection<Transaction> transactions3 = transactionManager.findAllTransactionsByAccount(originator3);
         //when
         int[] actualNumbersOfTransactions = {transactions1.toArray().length,
                 transactions2.toArray().length, transactions3.toArray().length};

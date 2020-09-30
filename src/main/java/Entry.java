@@ -15,5 +15,7 @@ public class Entry {
         return this.time;
     }
 
+    double getAmount() {return this.amount;}
+
 }
 

@@ -38,10 +38,10 @@ public class TransactionManager {
     }
 
     private void add(Transaction transaction) {
-        if (!transactions.containsKey(transaction.getBeneficiary())) {
-            transactions.put(transaction.getBeneficiary(), new ArrayList<>());
+        if (!transactions.containsKey(transaction.getOriginator())) {
+            transactions.put(transaction.getOriginator(), new ArrayList<>());
         }
-        transactions.get(transaction.getBeneficiary()).add(transaction);
+        transactions.get(transaction.getOriginator()).add(transaction);
     }
 }
 

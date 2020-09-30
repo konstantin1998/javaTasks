@@ -33,8 +33,8 @@ public class Transaction {
             throw new IllegalStateException("transaction is already executed");
         }
         //executed = true;
-        originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now()));
-        beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now()));
+        originator.addEntry(new Entry(beneficiary, this, -1 *amount, LocalDateTime.now()));
+        beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now()));
         return new Transaction(id, amount, originator, beneficiary, true, false);
     }
 
@@ -48,13 +48,13 @@ public class Transaction {
             throw new IllegalStateException("transaction is already rolled back");
         }
         //rolledBack = true;
-        originator.addEntry(new Entry(beneficiary, this, -1 * amount, LocalDateTime.now()));
-        beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now()));
+        originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now()));
+        beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now()));
         return new Transaction(id, amount, originator, beneficiary, true, true);
     }
 
-    Account getBeneficiary() {
-        return this.beneficiary;
+    Account getOriginator() {
+        return this.originator;
     }
 }
 

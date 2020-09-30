@@ -9,8 +9,9 @@ public class TransactionTest {
         double amount = 0;
         long id = 0;
         long accountId = 0;
-        Account originator = new Account(accountId, new TransactionManager());
-        Account beneficiary = new Account(accountId, new TransactionManager());
+        TransactionManager transactionManager = new TransactionManager();
+        Account originator = new Account(accountId, transactionManager);
+        Account beneficiary = new Account(accountId, transactionManager);
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //when
         Transaction executedTransaction = transaction.execute();
@@ -23,8 +24,9 @@ public class TransactionTest {
         double amount = 0;
         long id = 0;
         long accountId = 0;
-        Account originator = new Account(accountId, new TransactionManager());
-        Account beneficiary = new Account(accountId, new TransactionManager());
+        TransactionManager transactionManager = new TransactionManager();
+        Account originator = new Account(accountId, transactionManager);
+        Account beneficiary = new Account(accountId, transactionManager);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //then
@@ -36,8 +38,9 @@ public class TransactionTest {
         double amount = 0;
         long id = 0;
         long accountId = 0;
-        Account originator = new Account(accountId, new TransactionManager());
-        Account beneficiary = new Account(accountId, new TransactionManager());
+        TransactionManager transactionManager = new TransactionManager();
+        Account originator = new Account(accountId, transactionManager);
+        Account beneficiary = new Account(accountId, transactionManager);
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //when
         Transaction rolledBackTransaction = transaction.rollback();
@@ -50,8 +53,9 @@ public class TransactionTest {
         double amount = 0;
         long id = 0;
         long accountId = 0;
-        Account originator = new Account(accountId, new TransactionManager());
-        Account beneficiary = new Account(accountId, new TransactionManager());
+        TransactionManager transactionManager = new TransactionManager();
+        Account originator = new Account(accountId, transactionManager);
+        Account beneficiary = new Account(accountId, transactionManager);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //then
