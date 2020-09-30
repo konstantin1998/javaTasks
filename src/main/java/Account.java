@@ -56,9 +56,9 @@ public class Account {
 
     public double balanceOn(LocalDate date) {
         double balance = 0;
-        int minimalPossibleInt = -2147483648;
-        LocalDate beginningOfTimes = LocalDate.of(minimalPossibleInt, Month.JANUARY, 0);
-        for (Entry entry : (Entry[]) entries.betweenDates(beginningOfTimes, date).toArray()) {
+        int minimalPossibleYear = -999999999;
+        LocalDate beginningOfTimes = LocalDate.of(minimalPossibleYear, Month.JANUARY, 1);
+        for (Entry entry : entries.betweenDates(beginningOfTimes, date).toArray(new Entry[0])) {
             balance += entry.getAmount();
         }
         return balance;
@@ -71,7 +71,7 @@ public class Account {
 
     public void rollbackLastTransaction() {
         // write your code here
-        Transaction[] transactions = (Transaction[]) transactionManager.findAllTransactionsByAccount(this).toArray();
+        Transaction[] transactions = transactionManager.findAllTransactionsByAccount(this).toArray(new Transaction[0]);
         Transaction lastTransaction = transactions[transactions.length - 1];
         transactionManager.rollbackTransaction(lastTransaction);
     }
