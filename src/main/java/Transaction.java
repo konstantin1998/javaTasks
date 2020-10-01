@@ -63,5 +63,9 @@ public class Transaction {
     Account getBeneficiary() {
         return this.beneficiary;
     }
+
+    double getAmount() {
+        return this.amount;
+    }
 }
 
