@@ -1,6 +1,6 @@
 import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
-import java.security.Key;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,7 +9,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void savePutsItemToStorage(){
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         String value = "Hello world";
 
@@ -24,7 +24,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void saveAllPutsItemsToStorage(){
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         String[] values = {"str1", "str2", "str3"};
         storage.saveAll(Arrays.asList(values));
@@ -40,7 +40,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void findAllReturnsItemsFromStorage(){
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         ArrayList<String> values = new ArrayList<>();
         values.add("str1");
@@ -60,7 +60,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void findByKeyReturnsValueByGivenKey() {
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         String[] values = {"str1", "str2", "str3"};
         storage.saveAll(Arrays.asList(values));
@@ -72,7 +72,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void deleteByKeyDeletesElementCorrespondingToGivenKey() {
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         String value = "Hello world";
         storage.save(value);
@@ -85,7 +85,7 @@ public class SimpleEntitiesStorageTest {
     @Test
     void deleteAllDeletesGivenValues() {
         //given
-        KeyGenerator keyGenerator = new KeyGenerator();
+        IntegerStringKeyExtractor keyGenerator = new IntegerStringKeyExtractor();
         SimpleEntitiesStorage<Integer, String> storage = new SimpleEntitiesStorage<>(keyGenerator);
         ArrayList<String> values = new ArrayList<>();
         values.add("str1");

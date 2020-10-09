@@ -1,6 +1,6 @@
 import org.testng.annotations.Test;
-import java.util.Arrays;
-import java.util.Collections;
+
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -11,14 +11,14 @@ public class AnaliticsManagerTest {
         long id = 0;
         TransactionManager transactionManager = new TransactionManager();
         AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         double amount = 150;
         acc.add(amount);
         Double[] prises = {2.0, 3.0, 6.0, 10.0, 15.0, 11.0, 20.0, 9.0, 14.0, 17.0, 19.0, 3.0};
         for (double prise : prises) {
             acc.withdrawCash(prise);
         }
-        Transaction[] mostExpensivePurchases = analyticsManager.topTenExpensivePurchases(acc).toArray( new Transaction[0]);
+        Transaction[] mostExpensivePurchases = analyticsManager.topTenExpensivePurchases(acc).toArray(new Transaction[0]);
         //when
         int requiredNumberOfTransactions = 10;
         Double[] actualPrises = new Double[requiredNumberOfTransactions];
@@ -31,17 +31,18 @@ public class AnaliticsManagerTest {
         //then
         assertArrayEquals(expectedPrises, actualPrises);
     }
+
     @Test
     void mostFrequentBeneficiaryOfAccountReturnsMostFrequentBeneficiary() {
         //given
         long id = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         double amount = 150;
         acc.add(amount);
-        Account beneficiary1 = new Account(id, transactionManager);
-        Account beneficiary2 = new Account(id, transactionManager);
-        Account beneficiary3 = new Account(id, transactionManager);
+        Account beneficiary1 = new DebitCard(id, transactionManager);
+        Account beneficiary2 = new DebitCard(id, transactionManager);
+        Account beneficiary3 = new DebitCard(id, transactionManager);
         int numberOfTransactions1 = 5;
         int numberOfTransactions2 = 10;
         int numberOfTransactions3 = 15;
@@ -63,5 +64,79 @@ public class AnaliticsManagerTest {
         Account mostFrequentBeneficiary = analyticsManager.mostFrequentBeneficiaryOfAccount(acc);
         //then
         assertEquals(beneficiary3, mostFrequentBeneficiary);
+    }
+
+    @Test
+    void overallBalanceOfAccountsReturnsSumOfBalancesOfGivenAccounts() {
+        //given
+        long id = 0;
+        TransactionManager transactionManager = new TransactionManager();
+        ArrayList<DebitCard> debitCards = new ArrayList<>();
+        int numberOfAccounts = 5;
+        double amount = 150;
+        for (int i = 0; i < numberOfAccounts; i++) {
+            DebitCard card = new DebitCard(id, transactionManager);
+            card.add(amount);
+            debitCards.add(card);
+            id++;
+        }
+        //when
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+        double totalBalance = analyticsManager.overallBalanceOfAccounts(debitCards);
+        //then
+        assertEquals(numberOfAccounts * amount, totalBalance);
+    }
+
+    @Test
+    void uniqueKeysOfReturnsUniqueKeys() {
+        //given
+        long id = 0;
+        IntegerAccountKeyExtractor keyGenerator = new IntegerAccountKeyExtractor();
+        TransactionManager transactionManager = new TransactionManager();
+        ArrayList<DebitCard> debitCards = new ArrayList<>();
+        int numberOfAccounts = 5;
+        ArrayList<Integer> expectedKeys = new ArrayList<>();
+        for (int i = 0; i < numberOfAccounts; i++) {
+            DebitCard card = new DebitCard(id, transactionManager);
+            debitCards.add(card);
+            debitCards.add(card);
+            expectedKeys.add(card.hashCode());
+            id++;
+        }
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+        //when
+        ArrayList<Integer> keys = new ArrayList<>((Collection<Integer>) analyticsManager.uniqueKeysOf(debitCards, keyGenerator));
+        expectedKeys.sort((Integer::compareTo));
+        keys.sort((Integer::compareTo));
+        keys.toArray();
+        //then
+        assertEquals(expectedKeys, keys);
+    }
+
+    @Test
+    void accountsRangeFromReturnsSortedListOfAccounts() {
+        //given
+        long id = 0;
+        TransactionManager transactionManager = new TransactionManager();
+        ArrayList<DebitCard> debitCards = new ArrayList<>();
+        int numberOfAccounts = 5;
+        for (int i = 0; i < numberOfAccounts; i++) {
+            DebitCard card = new DebitCard(id, transactionManager);
+            debitCards.add(card);
+            id++;
+        }
+        Comparator<Account> comparator = Comparator.comparingInt(Object::hashCode);
+        debitCards.sort(comparator);
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+        //when
+        ArrayList<Account> actualAccounts = new ArrayList<>(
+                (Collection<Account>) analyticsManager.accountsRangeFrom(debitCards, debitCards.get(0), comparator)
+        );
+        ArrayList<Account> expectedAccounts = new ArrayList<>();
+        for (int i = 0; i < numberOfAccounts; i++) {
+            expectedAccounts.add((Account)debitCards.get(i));
+        }
+        //then
+        assertEquals(expectedAccounts, actualAccounts);
     }
 }

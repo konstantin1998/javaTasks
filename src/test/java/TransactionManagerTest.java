@@ -1,7 +1,6 @@
 import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collection;
-import java.time.*;
 
 public class TransactionManagerTest {
     @Test
@@ -10,10 +9,10 @@ public class TransactionManagerTest {
         double amount = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account beneficiary = new Account(accountId, transactionManager);
-        Account originator1 = new Account(accountId, transactionManager);
-        Account originator2 = new Account(accountId, transactionManager);
-        Account originator3 = new Account(accountId, transactionManager);
+        DebitCard beneficiary = new DebitCard(accountId, transactionManager);
+        DebitCard originator1 = new DebitCard(accountId, transactionManager);
+        DebitCard originator2 = new DebitCard(accountId, transactionManager);
+        DebitCard originator3 = new DebitCard(accountId, transactionManager);
 
         int k = 5;
         int l = 10;

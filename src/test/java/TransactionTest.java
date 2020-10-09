@@ -10,8 +10,8 @@ public class TransactionTest {
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(accountId, transactionManager);
-        Account beneficiary = new Account(accountId, transactionManager);
+        DebitCard originator = new DebitCard(accountId, transactionManager);
+        DebitCard beneficiary = new DebitCard(accountId, transactionManager);
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //when
         Transaction executedTransaction = transaction.execute();
@@ -25,8 +25,8 @@ public class TransactionTest {
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(accountId, transactionManager);
-        Account beneficiary = new Account(accountId, transactionManager);
+        DebitCard originator = new DebitCard(accountId, transactionManager);
+        DebitCard beneficiary = new DebitCard(accountId, transactionManager);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //then
@@ -39,8 +39,8 @@ public class TransactionTest {
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(accountId, transactionManager);
-        Account beneficiary = new Account(accountId, transactionManager);
+        DebitCard originator = new DebitCard(accountId, transactionManager);
+        DebitCard beneficiary = new DebitCard(accountId, transactionManager);
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //when
         Transaction rolledBackTransaction = transaction.rollback();
@@ -54,8 +54,8 @@ public class TransactionTest {
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(accountId, transactionManager);
-        Account beneficiary = new Account(accountId, transactionManager);
+        DebitCard originator = new DebitCard(accountId, transactionManager);
+        DebitCard beneficiary = new DebitCard(accountId, transactionManager);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
         //then

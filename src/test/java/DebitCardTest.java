@@ -2,14 +2,14 @@ import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.*;
 
-public class AccountTest {
+public class DebitCardTest {
     @Test
     void addReturnsTrueIfAmountIsPositive() {
         //given
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         //when
         boolean isTrue = acc.add(amount);
         //then
@@ -21,7 +21,7 @@ public class AccountTest {
         long id = 0;
         double amount = -10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         //when
         boolean isFalse = acc.add(amount);
         //then
@@ -32,7 +32,7 @@ public class AccountTest {
         //given
         long id = 0;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         double amount = 10;
         acc.addCash(amount);
         Thread.sleep(100);
@@ -52,8 +52,8 @@ public class AccountTest {
     void withdrawReturnsTrueIfAmountIsPositiveAndAvailable() {
         //given
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(0, transactionManager);
-        Account beneficiary = new Account(1, transactionManager);
+        DebitCard originator = new DebitCard(0, transactionManager);
+        DebitCard beneficiary = new DebitCard(1, transactionManager);
         double amount = 100;
         originator.add(amount);
         //when
@@ -65,8 +65,8 @@ public class AccountTest {
     void withdrawReturnsFalseIfAmountIsNegativeOrUnavailable() {
         //given
         TransactionManager transactionManager = new TransactionManager();
-        Account originator = new Account(0, transactionManager);
-        Account beneficiary = new Account(1, transactionManager);
+        DebitCard originator = new DebitCard(0, transactionManager);
+        DebitCard beneficiary = new DebitCard(1, transactionManager);
         double amount = 100;
         originator.add(amount);
         //when
@@ -78,7 +78,7 @@ public class AccountTest {
     void withdrawCashReturnsTrueIfAmountIsPositiveAndAvailable() {
         //given
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(0, transactionManager);
+        DebitCard acc = new DebitCard(0, transactionManager);
         double amount = 100;
         acc.add(amount);
         //when
@@ -90,7 +90,7 @@ public class AccountTest {
     void withdrawCashReturnsFalseIfAmountIsNegativeOrUnavailable() {
         //given
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(0, transactionManager);
+        DebitCard acc = new DebitCard(0, transactionManager);
         double amount = 100;
         //when
         boolean isFalse = acc.withdrawCash(amount);
@@ -103,7 +103,7 @@ public class AccountTest {
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         //when
         boolean isTrue = acc.addCash(amount);
         assertTrue(isTrue);
@@ -114,7 +114,7 @@ public class AccountTest {
         long id = 0;
         double amount = -10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         //when
         boolean isFalse = acc.addCash(amount);
         //then
@@ -126,7 +126,7 @@ public class AccountTest {
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         acc.add(amount);
         Thread.sleep(100);
         acc.rollbackLastTransaction();
@@ -142,7 +142,7 @@ public class AccountTest {
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
-        Account acc = new Account(id, transactionManager);
+        DebitCard acc = new DebitCard(id, transactionManager);
         acc.add(amount);
         Thread.sleep(100);
         acc.add(amount);
