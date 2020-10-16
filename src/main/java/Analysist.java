@@ -68,6 +68,7 @@ public class Analysist {
                 e.printStackTrace();
             }
         }
+
         if (type.equals("excel")) {
             readFromExcel();
         }
