@@ -1,5 +1,10 @@
+import bsh.servlet.SimpleTemplate;
+
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class AnalyticsManager {
     private final TransactionManager transactionManager;
@@ -9,23 +14,31 @@ public class AnalyticsManager {
     }
 
     public Account mostFrequentBeneficiaryOfAccount(Account account) {
-        Account beneficiary = null;
-        double amount = 0;
         Collection<Transaction> transactions = transactionManager.findAllTransactionsByAccount(account);
+
+        HashMap<Account, Integer> accountsAndFrequencies = new HashMap<>();
+
         for (Transaction transaction : transactions) {
-            if (transaction.getBeneficiary() != null || transaction.getAmount() > amount) {
-                amount = transaction.getAmount();
-                beneficiary = transaction.getBeneficiary();
+            if (transaction.getBeneficiary() != null && transaction.getAmount() > 0) {
+                Account beneficiary = transaction.getBeneficiary();
+                if (!accountsAndFrequencies.containsKey(beneficiary)) {
+                    accountsAndFrequencies.put(beneficiary, 1);
+                } else {
+                    int oldFrequency = accountsAndFrequencies.get(beneficiary);
+                    accountsAndFrequencies.put(beneficiary, oldFrequency + 1);
+                }
+
             }
         }
-        return beneficiary;
+
+        return accountsAndFrequencies.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).get().getKey();
     }
 
     public Collection<Transaction> topTenExpensivePurchases(Account account) {
-        // write your code here
+
         int requiredNumberOfTransactions = 10;
         Collection<Transaction> transactions = transactionManager.findAllTransactionsByAccount(account);
-        //System.out.println("Total transactions:" + transactions.size());
+
         TreeMap<Double, Transaction> purchases = new TreeMap<Double, Transaction>();
         for(Transaction transaction : transactions) {
             double amount = transaction.getAmount();
@@ -33,36 +46,55 @@ public class AnalyticsManager {
                 purchases.put(amount, transaction);
             }
         }
-        //System.out.println("Positive transactions:" + purchases.size());
-        Transaction[] transactionsSortedByPrise = purchases.descendingMap().values().toArray(new Transaction[0]);
-        ArrayList<Transaction> mostExpensivePurchases = new ArrayList<Transaction>();
-        mostExpensivePurchases.addAll(Arrays.asList(transactionsSortedByPrise)
-                .subList(0, Math.min(requiredNumberOfTransactions, transactionsSortedByPrise.length)));
-        //System.out.println("Returned transactions:" + mostExpensivePurchases.size());
-        return (Collection<Transaction>)mostExpensivePurchases;
+
+        return purchases
+                .entrySet()
+                .stream()
+                .sorted((o1, o2) -> {
+                    double diff = o1.getKey() - o2.getKey();
+                    if (diff > 0) {
+                        return -1;
+                    }
+                    if (diff == 0) {
+                        return 0;
+                    }
+                    return 1; })
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList())
+                .subList(0, Math.min(requiredNumberOfTransactions, purchases.entrySet().size()));
     }
 
     public double overallBalanceOfAccounts(List<? extends Account> accounts) {
-        double balance = 0;
-        for (Account account : accounts) {
-            balance += account.balanceOn(LocalDate.now());
-        }
-        return balance;
+
+        return accounts
+                .stream()
+                .mapToDouble((item) -> item.balanceOn(LocalDate.now()))
+                .sum();
     }
 
     public<K> Set<K> uniqueKeysOf(List<? extends Account> accounts, KeyExtractor<? extends K, ? super Account> keyExtractor) {
-        Set<K> set = new HashSet<>();
-        for (Account account : accounts) {
-            set.add(keyExtractor.extract(account));
-        }
-        return set;
+
+        return accounts
+                .stream()
+                .map(keyExtractor::extract)
+                .collect(Collectors.toSet());
     }
 
     public List<Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<? super Account> comparator) {
-        ArrayList<Account> accs = new ArrayList<>(accounts);
-        accs.sort(comparator);
+        ArrayList<Account> accs = accounts.stream().sorted(comparator).collect(Collectors.toCollection(ArrayList::new));
         int lastIndex = accs.lastIndexOf(minAccount);
-        return accs.subList(Math.max(0, lastIndex), accs.size());
+        return accs.stream().skip(Math.max(lastIndex, 0)).collect(Collectors.toList());
+    }
+
+    public Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDate from, LocalDate to) {
+        Function<Collection<Entry>, Stream<Entry>> apply = Collection::stream;
+        return accounts
+                .stream()
+                .map((account) -> account.history(from, to))
+                .flatMap(apply)
+                .filter((item) -> item.getAmount() < 0)
+                .min(Comparator.comparingDouble(Entry::getAmount));
+
     }
 
 }

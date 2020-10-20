@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.Collection;
 
 public class BonusAccount implements Account{
     private final double rate;
@@ -23,5 +24,10 @@ public class BonusAccount implements Account{
     @Override
     public void addEntry(Entry entry) {
         entries.addEntry(entry);
+    }
+
+    @Override
+    public Collection<Entry> history(LocalDate from, LocalDate to) {
+        return entries.betweenDates(from, to);
     }
 }

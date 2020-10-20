@@ -1,5 +1,6 @@
 import org.testng.annotations.Test;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,5 +139,47 @@ public class AnaliticsManagerTest {
         }
         //then
         assertEquals(expectedAccounts, actualAccounts);
+    }
+
+    private void withdraw(DebitCard originator, DebitCard beneficiary, double[] amountsToWithdraw) {
+        for (double amountToWithdraw : amountsToWithdraw) {
+            originator.withdraw(amountToWithdraw, beneficiary);
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Test
+    void maxExpenseReturnsEntryWithLargestAmount() {
+        //given
+        long id = 1;
+        TransactionManager transactionManager = new TransactionManager();
+        DebitCard beneficiary = new DebitCard(id, transactionManager);
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+
+        double amount = 100;
+        double[] amountsToWithdraw = new double[]{1.0, 5.0, 10.0, 15.0};
+
+        DebitCard originator1 = new DebitCard(id, transactionManager);
+        originator1.addCash(amount);
+        withdraw(originator1, beneficiary, amountsToWithdraw);
+
+        DebitCard originator2 = new DebitCard(id, transactionManager);
+        originator1.addCash(amount);
+        withdraw(originator2, beneficiary, amountsToWithdraw);
+
+        LocalDate today = LocalDate.now();
+        LocalDate yesterday = today.minusDays(1);
+        //when
+        Entry mostExpensiveEntry = analyticsManager
+                .maxExpenseAmountEntryWithinInterval(
+                        Arrays.asList(originator1, originator2),
+                        yesterday,
+                        today).get();
+        //then
+        assertEquals(amountsToWithdraw[amountsToWithdraw.length - 1], -1 * mostExpensiveEntry.getAmount());
     }
 }
