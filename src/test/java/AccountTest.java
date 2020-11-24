@@ -1,6 +1,7 @@
 import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.*;
+import java.util.TimeZone;
 
 public class AccountTest {
     @Test
@@ -34,17 +35,23 @@ public class AccountTest {
         TransactionManager transactionManager = new TransactionManager();
         Account acc = new Account(id, transactionManager);
         double amount = 10;
-        acc.addCash(amount);
-        //Thread.sleep(100);
-        //acc.add(amount);
-        //Thread.sleep(100);
-        //acc.rollbackLastTransaction();
-        //Thread.sleep(100);
-        //acc.addCash(amount);
-        //Thread.sleep(100);
+        TimeZone trueTimeZone = TimeZone.getDefault();
+//
+//        acc.addCash(amount);
+//        TimeZone.setDefault(TimeZone.getTimeZone("Portugal"));
+//
+//        acc.add(amount);
+//        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
+//
+//        acc.rollbackLastTransaction();
+//        TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
+//
+//        acc.addCash(amount);
+//        TimeZone.setDefault(trueTimeZone);
+
         //when
-        double expectedBalance = 10;
-        double actualBalance = acc.balanceOn(LocalDate.now());
+        double expectedBalance = 20;
+        double actualBalance = acc.balanceOn(LocalDate.now().plusDays(2));
         //then
         assertEquals(expectedBalance, actualBalance);
     }
