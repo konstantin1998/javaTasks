@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 public class TransactionManager {
     /**
@@ -10,7 +11,7 @@ public class TransactionManager {
      * @param beneficiary
      * @return created Transaction
      */
-    private HashMap<Account, ArrayList<Transaction>> transactions;
+    private Map<Account, ArrayList<Transaction>> transactions;
     private long id;
 
     TransactionManager() {
@@ -24,12 +25,12 @@ public class TransactionManager {
     }
 
     public Collection<Transaction> findAllTransactionsByAccount(Account account) {
-        return (Collection<Transaction>)transactions.get(account);
+        return transactions.get(account);
     }
 
     public void rollbackTransaction(Transaction transaction) {
-        Transaction rolledBackTansaction = transaction.rollback();
-        add(rolledBackTansaction);
+        Transaction rolledBackTransaction = transaction.rollback();
+        add(rolledBackTransaction);
     }
 
     public void executeTransaction(Transaction transaction) {
@@ -42,6 +43,13 @@ public class TransactionManager {
             transactions.put(transaction.getOriginator(), new ArrayList<>());
         }
         transactions.get(transaction.getOriginator()).add(transaction);
+
+        if (transaction.getBeneficiary() != null) {
+            if (!transactions.containsKey(transaction.getBeneficiary())) {
+                transactions.put(transaction.getBeneficiary(), new ArrayList<>());
+            }
+            transactions.get(transaction.getBeneficiary()).add(transaction);
+        }
     }
 }
 

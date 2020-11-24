@@ -35,15 +35,15 @@ public class AccountTest {
         Account acc = new Account(id, transactionManager);
         double amount = 10;
         acc.addCash(amount);
-        Thread.sleep(100);
-        acc.add(amount);
-        Thread.sleep(100);
-        acc.rollbackLastTransaction();
-        Thread.sleep(100);
-        acc.addCash(amount);
-        Thread.sleep(100);
+        //Thread.sleep(100);
+        //acc.add(amount);
+        //Thread.sleep(100);
+        //acc.rollbackLastTransaction();
+        //Thread.sleep(100);
+        //acc.addCash(amount);
+        //Thread.sleep(100);
         //when
-        double expectedBalance = 20;
+        double expectedBalance = 10;
         double actualBalance = acc.balanceOn(LocalDate.now());
         //then
         assertEquals(expectedBalance, actualBalance);

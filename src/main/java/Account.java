@@ -1,6 +1,7 @@
 import java.time.LocalDate;
-import java.time.Month;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class Account {
     private final long id;
@@ -56,9 +57,9 @@ public class Account {
 
     public double balanceOn(LocalDate date) {
         double balance = 0;
-        int minimalPossibleYear = -999999999;
-        LocalDate beginningOfTimes = LocalDate.of(minimalPossibleYear, Month.JANUARY, 1);
-        for (Entry entry : entries.betweenDates(beginningOfTimes, date).toArray(new Entry[0])) {
+
+        Collection<Entry> selectedEntries = entries.entriesUpToDate(date);
+        for (Entry entry : selectedEntries) {
             balance += entry.getAmount();
         }
         return balance;
@@ -71,12 +72,16 @@ public class Account {
 
     public void rollbackLastTransaction() {
         // write your code here
-        Transaction[] transactions = transactionManager.findAllTransactionsByAccount(this).toArray(new Transaction[0]);
-        Transaction lastTransaction = transactions[transactions.length - 1];
+        List<Transaction> transactions = new ArrayList<>(transactionManager.findAllTransactionsByAccount(this));
+        Transaction lastTransaction = transactions.get(transactions.size() - 1);
         transactionManager.rollbackTransaction(lastTransaction);
     }
 
     void addEntry(Entry entry) {
         entries.addEntry(entry);
+    }
+
+    public Entry getLastEntry() {
+        return entries.last();
     }
 }

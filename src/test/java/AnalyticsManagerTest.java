@@ -4,7 +4,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AnaliticsManagerTest {
+public class AnalyticsManagerTest {
     @Test
     void topTenExpensivePurchasesReturnsTransactionsWithHighestAmount() {
         //given
@@ -25,6 +25,7 @@ public class AnaliticsManagerTest {
         for (int i = 0; i <= requiredNumberOfTransactions - 1; i++) {
             actualPrises[i] = mostExpensivePurchases[i].getAmount();
         }
+
         Arrays.sort(prises, Collections.reverseOrder());
         Double[] expectedPrises = new Double[requiredNumberOfTransactions];
         System.arraycopy(prises, 0, expectedPrises, 0, requiredNumberOfTransactions);

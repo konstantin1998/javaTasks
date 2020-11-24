@@ -19,18 +19,23 @@ public class TransactionTest {
         assertThrows(IllegalStateException.class, executedTransaction::execute);
     }
     @Test
-    void excecuteExequtesTransaction() {
-        //given
-        double amount = 0;
+    void executeExecutesTransaction() {
+
+        double amount = 10;
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
         Account originator = new Account(accountId, transactionManager);
+        originator.add(2 * amount);
         Account beneficiary = new Account(accountId, transactionManager);
+        beneficiary.add(2 * amount);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
+        transaction = transaction.execute();
         //then
-        assertDoesNotThrow((Executable) transaction::execute, "transaction is already executed");
+        assertTrue(transaction.isExecuted());
+        assertEquals(-1 * amount, originator.getLastEntry().getAmount());
+        assertEquals(amount, beneficiary.getLastEntry().getAmount());
     }
     @Test
     void rollbackThrowsExceptionIfTransactionIsRolledBack() {
@@ -50,15 +55,21 @@ public class TransactionTest {
     @Test
     void rollbackRollsBackTransaction() {
         //given
-        double amount = 0;
+        double amount = 10;
         long id = 0;
         long accountId = 0;
         TransactionManager transactionManager = new TransactionManager();
         Account originator = new Account(accountId, transactionManager);
+        originator.add(2 * amount);
         Account beneficiary = new Account(accountId, transactionManager);
+        beneficiary.add(2 * amount);
         //when
         Transaction transaction = new Transaction(id, amount, originator, beneficiary);
+        transaction = transaction.execute();
+        transaction = transaction.rollback();
         //then
-        assertDoesNotThrow((Executable) transaction::rollback, "transaction is already executed");
+        assertTrue(transaction.isRolledBack());
+        assertEquals(amount, originator.getLastEntry().getAmount());
+        assertEquals(-1 * amount, beneficiary.getLastEntry().getAmount());
     }
 }

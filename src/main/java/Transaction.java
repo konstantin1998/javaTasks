@@ -16,7 +16,8 @@ public class Transaction {
         this.executed = false;
         this.rolledBack = false;
     }
-    private Transaction(long id, double amount, Account originator, Account beneficiary, boolean executed, boolean rolledBack){
+    private Transaction(long id, double amount, Account originator,
+                        Account beneficiary, boolean executed, boolean rolledBack){
         this.id = id;
         this.amount = amount;
         this.originator = originator;
@@ -48,7 +49,7 @@ public class Transaction {
         if (rolledBack) {
             throw new IllegalStateException("transaction is already rolled back");
         }
-        //rolledBack = true;
+
         originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now()));
         if (beneficiary != null) {
             beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now()));
@@ -66,6 +67,14 @@ public class Transaction {
 
     double getAmount() {
         return this.amount;
+    }
+
+    public boolean isRolledBack() {
+        return rolledBack;
+    }
+
+    public boolean isExecuted() {
+        return executed;
     }
 }
 

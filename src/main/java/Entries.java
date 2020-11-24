@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.time.*;
 
@@ -6,7 +7,7 @@ import java.time.*;
  * Collection of entries for the account. Use it to save and get history of payments
  */
 public class Entries {
-    private final TreeMap<LocalDateTime, Entry> entries;
+    private final NavigableMap<LocalDateTime, Entry> entries;
 
     Entries() {
         entries = new TreeMap<LocalDateTime, Entry>(LocalDateTime::compareTo);
@@ -18,8 +19,7 @@ public class Entries {
 
     Collection<Entry> from(LocalDate date) {
         // write your code here
-        LocalTime localTime = LocalTime.of(0,0,0,0);
-        LocalDateTime since = LocalDateTime.of(date, localTime);
+        LocalDateTime since = date.atStartOfDay();
         return entries.tailMap(since, true).values();
     }
 
@@ -35,6 +35,12 @@ public class Entries {
     Entry last() {
         // write your code here
         return entries.get(entries.lastKey());
+    }
+
+    Collection<Entry> entriesUpToDate(LocalDate date) {
+        LocalTime endingOfDay = LocalTime.of(23, 59, 59, 999999999);
+        LocalDateTime timeBorder = LocalDateTime.of(date, endingOfDay);
+        return entries.headMap(timeBorder).values();
     }
 
 }
