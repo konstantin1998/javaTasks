@@ -1,3 +1,4 @@
+import org.mockito.Mockito;
 import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.*;
@@ -29,31 +30,17 @@ public class AccountTest {
         assertFalse(isFalse);
     }
     @Test
-    void balanceOnReturnsBalanceOnDate() throws InterruptedException {
+    void balanceOnReturnsBalanceOnDate() {
         //given
         long id = 0;
         TransactionManager transactionManager = new TransactionManager();
         Account acc = new Account(id, transactionManager);
         double amount = 10;
-        TimeZone trueTimeZone = TimeZone.getDefault();
-//
-//        acc.addCash(amount);
-//        TimeZone.setDefault(TimeZone.getTimeZone("Portugal"));
-//
-//        acc.add(amount);
-//        TimeZone.setDefault(TimeZone.getTimeZone("Asia/Kolkata"));
-//
-//        acc.rollbackLastTransaction();
-//        TimeZone.setDefault(TimeZone.getTimeZone("America/Sao_Paulo"));
-//
-//        acc.addCash(amount);
-//        TimeZone.setDefault(trueTimeZone);
-
+        acc.addCash(amount);
         //when
-        double expectedBalance = 20;
-        double actualBalance = acc.balanceOn(LocalDate.now().plusDays(2));
+        double actualBalance = acc.balanceOn(LocalDate.now());
         //then
-        assertEquals(expectedBalance, actualBalance);
+        assertEquals(amount, actualBalance);
     }
     @Test
     void withdrawReturnsTrueIfAmountIsPositiveAndAvailable() {
@@ -144,27 +131,19 @@ public class AccountTest {
         assertEquals(expectedBalance, currentBalance);
     }
     @Test
-    void historyReturnsOperationsPerformedBetweenGivenDates() throws InterruptedException {
+    void historyReturnsOperationsPerformedBetweenGivenDates() {
         //given
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
         Account acc = new Account(id, transactionManager);
         acc.add(amount);
-        Thread.sleep(100);
-        acc.add(amount);
-        Thread.sleep(100);
-        acc.addCash(amount);
-        Thread.sleep(100);
-        acc.rollbackLastTransaction();
-        Thread.sleep(100);
-        acc.withdrawCash(amount);
-        Thread.sleep(100);
+
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
         //when
-        double expectedNumberOfEntries = 5;
+        double expectedNumberOfEntries = 1;
         double actualNumberOfEntries = acc.history(yesterday, tomorrow).toArray().length;
         //then
         assertEquals(expectedNumberOfEntries, actualNumberOfEntries);
