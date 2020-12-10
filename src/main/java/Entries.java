@@ -1,4 +1,5 @@
 import java.util.Collection;
+import java.util.NavigableMap;
 import java.util.TreeMap;
 import java.time.*;
 
@@ -6,7 +7,7 @@ import java.time.*;
  * Collection of entries for the account. Use it to save and get history of payments
  */
 public class Entries {
-    private final TreeMap<LocalDateTime, Entry> entries;
+    private final NavigableMap<LocalDateTime, Entry> entries;
 
     Entries() {
         entries = new TreeMap<LocalDateTime, Entry>(LocalDateTime::compareTo);

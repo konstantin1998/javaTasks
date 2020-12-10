@@ -27,8 +27,7 @@ public class SimpleEntitiesStorage<K, V> implements BankEntitiesStorage<K, V>{
 
     @Override
     public List<V> findAll() {
-        ArrayList<V> list = new ArrayList<>((Collection<V>)storage.values());
-        return (List<V>)list;
+        return new ArrayList<V>(storage.values());
     }
 
     @Override

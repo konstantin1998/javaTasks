@@ -4,7 +4,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AnaliticsManagerTest {
+public class AnalyticsManagerTest {
     @Test
     void topTenExpensivePurchasesReturnsTransactionsWithHighestAmount() {
         //given
@@ -12,24 +12,34 @@ public class AnaliticsManagerTest {
         TransactionManager transactionManager = new TransactionManager();
         AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
         DebitCard acc = new DebitCard(id, transactionManager);
-        double amount = 150;
-        acc.add(amount);
-        Double[] prises = {2.0, 3.0, 6.0, 10.0, 15.0, 11.0, 20.0, 9.0, 14.0, 17.0, 19.0, 3.0};
-        for (double prise : prises) {
-            acc.withdrawCash(prise);
-        }
-        Transaction[] mostExpensivePurchases = analyticsManager.topTenExpensivePurchases(acc).toArray(new Transaction[0]);
+        ArrayList<Double> prises = new ArrayList<>(Arrays.asList(2.0, 3.0, 6.0, 10.0, 15.0, 11.0, 20.0, 9.0, 14.0, 17.0, 19.0, 3.0));
+        prepareCard(acc, prises);
+
+        Collection<Transaction> mostExpensivePurchases = analyticsManager.topTenExpensivePurchases(acc);
         //when
         int requiredNumberOfTransactions = 10;
-        Double[] actualPrises = new Double[requiredNumberOfTransactions];
-        for (int i = 0; i <= requiredNumberOfTransactions - 1; i++) {
-            actualPrises[i] = mostExpensivePurchases[i].getAmount();
-        }
-        Arrays.sort(prises, Collections.reverseOrder());
-        Double[] expectedPrises = new Double[requiredNumberOfTransactions];
-        System.arraycopy(prises, 0, expectedPrises, 0, requiredNumberOfTransactions);
+        ArrayList<Double> actualPrises = getActualPrises(mostExpensivePurchases);
+        prises.sort((o1, o2) -> (int) (o2 - o1));
+
+        ArrayList<Double> expectedPrises = new ArrayList<>(prises.subList(0, requiredNumberOfTransactions));
         //then
-        assertArrayEquals(expectedPrises, actualPrises);
+        assertArrayEquals(expectedPrises.toArray(new Double[0]), actualPrises.toArray(new Double[0]));
+    }
+
+    private void prepareCard(DebitCard card, Collection<Double> prises) {
+        double amount = 150;
+        card.add(amount);
+        for (double prise : prises) {
+            card.withdrawCash(prise);
+        }
+    }
+
+    private ArrayList<Double> getActualPrises(Collection<Transaction> transactions) {
+        ArrayList<Double> actualPrises = new ArrayList<>();
+        for (Transaction transaction: transactions) {
+            actualPrises.add(transaction.getAmount());
+        }
+        return actualPrises;
     }
 
     @Test
@@ -46,24 +56,22 @@ public class AnaliticsManagerTest {
         int numberOfTransactions1 = 5;
         int numberOfTransactions2 = 10;
         int numberOfTransactions3 = 15;
-        double moneyToWithdraw = 1;
-        for (int i = 0; i < numberOfTransactions1; i++) {
-            acc.withdraw(moneyToWithdraw, beneficiary1);
-        }
-        acc.withdrawCash(moneyToWithdraw);
-        for (int i = 0; i < numberOfTransactions2; i++) {
-            acc.withdraw(moneyToWithdraw, beneficiary2);
-        }
-        acc.withdrawCash(moneyToWithdraw);
-        for (int i = 0; i < numberOfTransactions3; i++) {
-            acc.withdraw(moneyToWithdraw, beneficiary3);
-        }
-        acc.withdrawCash(moneyToWithdraw);
+
+        withdraw(acc, beneficiary1, numberOfTransactions1);
+        withdraw(acc, beneficiary2, numberOfTransactions2);
+        withdraw(acc, beneficiary3, numberOfTransactions3);
         //when
         AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
         Account mostFrequentBeneficiary = analyticsManager.mostFrequentBeneficiaryOfAccount(acc);
         //then
         assertEquals(beneficiary3, mostFrequentBeneficiary);
+    }
+
+    private void withdraw(DebitCard acc, Account beneficiary, int numberOfTransactions) {
+        double moneyToWithdraw = 1;
+        for (int i = 0; i < numberOfTransactions; i++) {
+            acc.withdraw(moneyToWithdraw, beneficiary);
+        }
     }
 
     @Test
@@ -105,19 +113,34 @@ public class AnaliticsManagerTest {
         }
         AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
         //when
-        ArrayList<Integer> keys = new ArrayList<>((Collection<Integer>) analyticsManager.uniqueKeysOf(debitCards, keyGenerator));
+        ArrayList<Integer> keys = new ArrayList<>(analyticsManager.uniqueKeysOf(debitCards, keyGenerator));
         expectedKeys.sort((Integer::compareTo));
         keys.sort((Integer::compareTo));
-        keys.toArray();
         //then
         assertEquals(expectedKeys, keys);
     }
 
+
     @Test
     void accountsRangeFromReturnsSortedListOfAccounts() {
         //given
-        long id = 0;
         TransactionManager transactionManager = new TransactionManager();
+        ArrayList<DebitCard> debitCards = getCards(transactionManager);
+
+        Comparator<Account> comparator = Comparator.comparingInt(Object::hashCode);
+        debitCards.sort(comparator);
+        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
+        //when
+        ArrayList<Account> actualAccounts = new ArrayList<>(
+                analyticsManager.accountsRangeFrom(debitCards, debitCards.get(0), comparator)
+        );
+        ArrayList<Account> expectedAccounts = new ArrayList<>(debitCards);
+        //then
+        assertEquals(expectedAccounts, actualAccounts);
+    }
+
+    private ArrayList<DebitCard> getCards(TransactionManager transactionManager) {
+        long id = 0;
         ArrayList<DebitCard> debitCards = new ArrayList<>();
         int numberOfAccounts = 5;
         for (int i = 0; i < numberOfAccounts; i++) {
@@ -125,18 +148,6 @@ public class AnaliticsManagerTest {
             debitCards.add(card);
             id++;
         }
-        Comparator<Account> comparator = Comparator.comparingInt(Object::hashCode);
-        debitCards.sort(comparator);
-        AnalyticsManager analyticsManager = new AnalyticsManager(transactionManager);
-        //when
-        ArrayList<Account> actualAccounts = new ArrayList<>(
-                (Collection<Account>) analyticsManager.accountsRangeFrom(debitCards, debitCards.get(0), comparator)
-        );
-        ArrayList<Account> expectedAccounts = new ArrayList<>();
-        for (int i = 0; i < numberOfAccounts; i++) {
-            expectedAccounts.add((Account)debitCards.get(i));
-        }
-        //then
-        assertEquals(expectedAccounts, actualAccounts);
+        return debitCards;
     }
 }

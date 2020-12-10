@@ -1,3 +1,4 @@
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 public class Transaction {
@@ -29,12 +30,13 @@ public class Transaction {
      * @throws IllegalStateException when was already executed
      */
     public Transaction execute() {
+        Clock clock = Clock.systemDefaultZone();
         if (executed) {
             throw new IllegalStateException("transaction is already executed");
         }
-        originator.addEntry(new Entry(beneficiary, this, -1 *amount, LocalDateTime.now()));
+        originator.addEntry(new Entry(beneficiary, this, -1 *amount, LocalDateTime.now(clock)));
         if (beneficiary != null) {
-            beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now()));
+            beneficiary.addEntry(new Entry(originator, this, amount, LocalDateTime.now(clock)));
         }
         return new Transaction(id, amount, originator, beneficiary, true, false);
     }
@@ -44,14 +46,14 @@ public class Transaction {
      * @throws IllegalStateException when was already rolled back
      */
     public Transaction rollback() {
-        // write your code here
+        Clock clock = Clock.systemDefaultZone();
         if (rolledBack) {
             throw new IllegalStateException("transaction is already rolled back");
         }
         //rolledBack = true;
-        originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now()));
+        originator.addEntry(new Entry(beneficiary, this, amount, LocalDateTime.now(clock)));
         if (beneficiary != null) {
-            beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now()));
+            beneficiary.addEntry(new Entry(originator, this, -1 * amount, LocalDateTime.now(clock)));
         }
         return new Transaction(id, amount, originator, beneficiary, true, true);
     }

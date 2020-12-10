@@ -1,3 +1,4 @@
+import org.mockito.Mockito;
 import org.testng.annotations.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.*;
@@ -121,14 +122,15 @@ public class DebitCardTest {
         assertFalse(isFalse);
     }
     @Test
-    void rollbackLastTransactionCanselsLastTransaction() throws InterruptedException {
+    void rollbackLastTransactionCanselsLastTransaction() {
         //given
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
         DebitCard acc = new DebitCard(id, transactionManager);
         acc.add(amount);
-        Thread.sleep(100);
+
+        Clock clock = Mockito.mock(Clock.class);
         acc.rollbackLastTransaction();
         //when
         double currentBalance = acc.balanceOn(LocalDate.now());
@@ -137,27 +139,19 @@ public class DebitCardTest {
         assertEquals(expectedBalance, currentBalance);
     }
     @Test
-    void historyReturnsOperationsPerformedBetweenGivenDates() throws InterruptedException {
+    void historyReturnsOperationsPerformedBetweenGivenDates() {
         //given
         long id = 0;
         double amount = 10;
         TransactionManager transactionManager = new TransactionManager();
         DebitCard acc = new DebitCard(id, transactionManager);
         acc.add(amount);
-        Thread.sleep(100);
-        acc.add(amount);
-        Thread.sleep(100);
-        acc.addCash(amount);
-        Thread.sleep(100);
-        acc.rollbackLastTransaction();
-        Thread.sleep(100);
-        acc.withdrawCash(amount);
-        Thread.sleep(100);
+
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
         //when
-        double expectedNumberOfEntries = 5;
+        double expectedNumberOfEntries = 1;
         double actualNumberOfEntries = acc.history(yesterday, tomorrow).toArray().length;
         //then
         assertEquals(expectedNumberOfEntries, actualNumberOfEntries);

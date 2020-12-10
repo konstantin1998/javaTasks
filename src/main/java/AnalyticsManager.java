@@ -22,10 +22,9 @@ public class AnalyticsManager {
     }
 
     public Collection<Transaction> topTenExpensivePurchases(Account account) {
-        // write your code here
         int requiredNumberOfTransactions = 10;
         Collection<Transaction> transactions = transactionManager.findAllTransactionsByAccount(account);
-        //System.out.println("Total transactions:" + transactions.size());
+
         TreeMap<Double, Transaction> purchases = new TreeMap<Double, Transaction>();
         for(Transaction transaction : transactions) {
             double amount = transaction.getAmount();
@@ -33,13 +32,12 @@ public class AnalyticsManager {
                 purchases.put(amount, transaction);
             }
         }
-        //System.out.println("Positive transactions:" + purchases.size());
-        Transaction[] transactionsSortedByPrise = purchases.descendingMap().values().toArray(new Transaction[0]);
-        ArrayList<Transaction> mostExpensivePurchases = new ArrayList<Transaction>();
-        mostExpensivePurchases.addAll(Arrays.asList(transactionsSortedByPrise)
-                .subList(0, Math.min(requiredNumberOfTransactions, transactionsSortedByPrise.length)));
-        //System.out.println("Returned transactions:" + mostExpensivePurchases.size());
-        return (Collection<Transaction>)mostExpensivePurchases;
+
+        Collection<Transaction> transactionsSortedByPrise = purchases.descendingMap().values();
+
+
+        return new ArrayList<>(purchases.descendingMap().values())
+                .subList(0, Math.min(requiredNumberOfTransactions, transactionsSortedByPrise.size()));
     }
 
     public double overallBalanceOfAccounts(List<? extends Account> accounts) {
@@ -59,10 +57,10 @@ public class AnalyticsManager {
     }
 
     public List<Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<? super Account> comparator) {
-        ArrayList<Account> accs = new ArrayList<>(accounts);
+        List<Account> accs = new ArrayList<>(accounts);
         accs.sort(comparator);
         int lastIndex = accs.lastIndexOf(minAccount);
-        return accs.subList(Math.max(0, lastIndex), accs.size());
+        return accs.subList(Math.max(0, lastIndex), accounts.size());
     }
 
 }
