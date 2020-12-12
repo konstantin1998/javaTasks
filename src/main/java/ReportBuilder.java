@@ -1,5 +1,12 @@
+import report.CsvReport;
+import report.ExcelReport;
+import report.Report;
+import reportStrategy.ReportContext;
+import reportStrategy.ReportManager;
+
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ReportBuilder<T> implements ReportGenerator<T>{
     private List<String> columnNames;
@@ -25,18 +32,21 @@ public class ReportBuilder<T> implements ReportGenerator<T>{
     }
 
     private void extractColumnNames(T entity) {
-        Field[] fields = entity.getClass().getDeclaredFields();
-        ArrayList<String> columnNames = new ArrayList<>();
+        List<Field> fields = Arrays
+                .stream(entity.getClass().getDeclaredFields())
+                .filter(field -> !field.isSynthetic())
+                .collect(Collectors.toList());
+        List<String> columnNames;
         if (fieldsToColumns == null) {
-            for (Field field : fields) {
-                columnNames.add(field.getName());
-            }
+            columnNames = fields.stream().map(Field::getName).collect(Collectors.toList());
         } else {
-            for (Field field : fields) {
-                String fieldName = field.getName();
-                String columnName = fieldsToColumns.get(fieldName);
-                columnNames.add(Objects.requireNonNullElse(columnName, fieldName));
-            }
+            columnNames = fields
+                    .stream()
+                    .map((Field field) -> {
+                        String fieldName = field.getName();
+                        String columnName = fieldsToColumns.get(fieldName);
+                        return Objects.requireNonNullElse(columnName, fieldName);})
+                    .collect(Collectors.toList());
         }
 
         this.columnNames = columnNames;
@@ -62,9 +72,8 @@ public class ReportBuilder<T> implements ReportGenerator<T>{
             reportTable.add(fieldsValues);
         }
 
-        if (type.equals("csv")) {
-            return new CSVreport(reportTable);
-        }
-        return new ExcelReport(reportTable);
+        ReportManager reportManager = new ReportManager();
+        ReportContext context = reportManager.getContext(type);
+        return context.getReport(reportTable);
     }
 }

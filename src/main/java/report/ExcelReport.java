@@ -1,18 +1,24 @@
+package report;
+
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import report.Report;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 
-public class ExcelReport implements Report{
-    private final Workbook book;
+public class ExcelReport implements Report {
+    private Workbook book;
 
-    ExcelReport(List<List<String>> reportTable) {
+    public ExcelReport(List<List<String>> reportTable) {
+        configureExelBook(reportTable);
+    }
+
+    private void configureExelBook(List<List<String>> reportTable) {
         Workbook book = new HSSFWorkbook();
         Sheet sheet = book.createSheet();
         for (int i = 0; i < reportTable.size(); i++) {
@@ -36,15 +42,4 @@ public class ExcelReport implements Report{
         return bos.toByteArray();
     }
 
-    @Override
-    public void writeTo(OutputStream os) {
-        byte[] bytes = asBytes();
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(bytes.length);
-        try {
-            bos.write(bytes);
-            bos.writeTo(os);
-        } catch(IOException e){
-            System.out.println(e.getMessage());
-        }
-    }
 }

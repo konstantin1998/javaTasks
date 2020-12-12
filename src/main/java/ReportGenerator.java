@@ -1,3 +1,5 @@
+import report.Report;
+
 import java.util.List;
 
 interface ReportGenerator<T> {

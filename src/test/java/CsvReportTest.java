@@ -1,10 +1,12 @@
 import org.junit.jupiter.api.Test;
+import report.Report;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class CSVreportTest {
+public class CsvReportTest {
     @Test
     public void writeToCheckIfReportIsWrittenToFileCorrectly() throws IOException {
         //given

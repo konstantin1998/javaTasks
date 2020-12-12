@@ -1,4 +1,9 @@
 import reader.MyReader;
+import report.CsvReport;
+import report.ExcelReport;
+import report.Report;
+import reportStrategy.ReportContext;
+import reportStrategy.ReportManager;
 
 import java.util.*;
 
@@ -20,12 +25,13 @@ public class Analysist {
         if (filePath.endsWith("excel")) {
             return "excel";
         }
-        return null;
+        return "";
     }
 
     public Report getReport(String pathToFile) {
         MyReader reader = readerGenerator.getReader(filePath);
         List<List<String>> records = reader.read();
+
         Map<Integer, Integer> customersAndExpenditures = new HashMap<>();
         for (List<String> record : records) {
             try {
@@ -49,10 +55,8 @@ public class Analysist {
 
         String type = extractType(pathToFile);
 
-        if (type.equals("csv")) {
-            return new CSVreport(reportTable);
-        }
-
-        return new ExcelReport(reportTable);
+        ReportManager reportManager = new ReportManager();
+        ReportContext context = reportManager.getContext(type);
+        return context.getReport(reportTable);
     }
 }
