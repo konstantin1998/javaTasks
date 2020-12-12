@@ -1,22 +1,19 @@
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class ReportBuilder<T> implements ReportGenerator<T>{
-    private String[] columnNames;
-    private HashMap<String, String> fieldsToColumns;
-    private final ArrayList<String[]> reportTable;
+    private List<String> columnNames;
+    private Map<String, String> fieldsToColumns;
+    private final List<List<String>> reportTable;
     private final String type;
 
-    ReportBuilder(HashMap<String, String> fieldsToColumns) {
+    ReportBuilder(Map<String, String> fieldsToColumns) {
         this.fieldsToColumns = fieldsToColumns;
         reportTable = new ArrayList<>();
         type = "csv";
     }
 
-    ReportBuilder(HashMap<String, String> fieldsToColumns, String type) {
+    ReportBuilder(Map<String, String> fieldsToColumns, String type) {
         this.fieldsToColumns = fieldsToColumns;
         reportTable = new ArrayList<>();
         this.type = type;
@@ -29,17 +26,16 @@ public class ReportBuilder<T> implements ReportGenerator<T>{
 
     private void extractColumnNames(T entity) {
         Field[] fields = entity.getClass().getDeclaredFields();
-        String[] columnNames = new String[fields.length];
-
+        ArrayList<String> columnNames = new ArrayList<>();
         if (fieldsToColumns == null) {
-            for (int i = 0; i < fields.length; i++) {
-                columnNames[i] = fields[i].getName();
+            for (Field field : fields) {
+                columnNames.add(field.getName());
             }
         } else {
-            for (int i = 0; i < fields.length; i++) {
-                String fieldName = fields[i].getName();
+            for (Field field : fields) {
+                String fieldName = field.getName();
                 String columnName = fieldsToColumns.get(fieldName);
-                columnNames[i] = Objects.requireNonNullElse(columnName, fieldName);
+                columnNames.add(Objects.requireNonNullElse(columnName, fieldName));
             }
         }
 
@@ -51,14 +47,14 @@ public class ReportBuilder<T> implements ReportGenerator<T>{
     public Report generate(List<T> entities) {
         for (T entity : entities) {
             Field[] fields = entity.getClass().getDeclaredFields();
-            String[] fieldsValues = new String[fields.length];
+            ArrayList<String> fieldsValues = new ArrayList<>();
             if (columnNames == null) {
                 extractColumnNames(entity);
             }
 
-            for (int i = 0; i < fields.length; i++) {
+            for (Field field : fields) {
                 try {
-                    fieldsValues[i] = String.valueOf(fields[i].get(entity));
+                    fieldsValues.add(String.valueOf(field.get(entity)));
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }

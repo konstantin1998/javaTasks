@@ -6,19 +6,20 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class ExcelReport implements Report{
     private final Workbook book;
 
-    ExcelReport(ArrayList<String[]> reportTable) {
+    ExcelReport(List<List<String>> reportTable) {
         Workbook book = new HSSFWorkbook();
         Sheet sheet = book.createSheet();
         for (int i = 0; i < reportTable.size(); i++) {
             Row row = sheet.createRow(i);
-            for (int j = 0; j < reportTable.get(i).length; j++) {
+            for (int j = 0; j < reportTable.get(i).size(); j++) {
                 Cell cell = row.createCell(j);
-                cell.setCellValue(reportTable.get(i)[j]);
+                cell.setCellValue(reportTable.get(i).get(j));
             }
         }
         this.book = book;
