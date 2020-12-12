@@ -1,18 +1,14 @@
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import reader.MyReader;
 
-import java.io.*;
 import java.util.*;
 
 public class Analysist {
     private final String filePath;
-    private final ArrayList<List<String>> records;
+    private final ReaderGenerator readerGenerator;
 
-    Analysist(String filePath) {
+    Analysist(String filePath, ReaderGenerator readerGenerator) {
         this.filePath = filePath;
-        records = new ArrayList<>();
-        //ArrayList<ArrayList<String>>
+        this.readerGenerator = readerGenerator;
     }
 
     private String extractType(String filePath) {
@@ -27,53 +23,10 @@ public class Analysist {
         return null;
     }
 
-    private void readFromCSV() throws IOException {
-        File file = new File(filePath);
-        BufferedReader br = new BufferedReader(new FileReader(file));
-        String line;
-        while ((line = br.readLine()) != null) {
-            records.add(Arrays.asList(line.split(",")));
-        }
-    }
-
-    private void readFromExcel() {
-        HSSFWorkbook excelBook = null;
-        try {
-            excelBook = new HSSFWorkbook(new FileInputStream(filePath));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        int sheetIndex = 0;
-        HSSFSheet sheet = Objects.requireNonNull(excelBook).getSheetAt(sheetIndex);
-        for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-            HSSFRow row = sheet.getRow(i);
-            String customerId = row.getCell(0).getStringCellValue();
-            String purchaseCost = row.getCell(1).getStringCellValue();
-
-            records.add(Arrays.asList(customerId, purchaseCost));
-        }
-    }
-
-    private void readReport() {
-        String type = extractType(filePath);
-
-        if (type.equals("csv")) {
-            try {
-                readFromCSV();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        if (type.equals("excel")) {
-            readFromExcel();
-        }
-    }
-
     public Report getReport(String pathToFile) {
-        readReport();
-        HashMap<Integer, Integer> customersAndExpenditures = new HashMap<>();
+        MyReader reader = readerGenerator.getReader(filePath);
+        List<List<String>> records = reader.read();
+        Map<Integer, Integer> customersAndExpenditures = new HashMap<>();
         for (List<String> record : records) {
             try {
                 int customerId = Integer.parseInt(record.get(0));

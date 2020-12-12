@@ -34,7 +34,7 @@ public class AnalisystTest {
         report.writeTo(fos);
 
         String completeReportPath = System.getProperty("user.dir") + "\\src\\test\\resources\\completeReport.csv";
-        Analysist analysist = new Analysist(reportPath);
+        Analysist analysist = new Analysist(reportPath, new ReaderGenerator());
 
         Report completeReport = analysist.getReport(completeReportPath);
         try {
