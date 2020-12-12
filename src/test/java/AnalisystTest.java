@@ -12,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AnalisystTest {
     @Test
     public void getReportCheckIfAnalysistMakesRightReport() throws IOException {
-
         String reportPath = System.getProperty("user.dir") + "\\src\\test\\resources\\report.csv";
         writeReportForAnalysis(reportPath);
 

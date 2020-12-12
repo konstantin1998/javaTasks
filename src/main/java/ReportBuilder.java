@@ -5,6 +5,7 @@ import reportStrategy.ReportContext;
 import reportStrategy.ReportManager;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,7 @@ public class ReportBuilder<T> implements ReportGenerator<T>{
         List<Field> fields = Arrays
                 .stream(entity.getClass().getDeclaredFields())
                 .filter(field -> !field.isSynthetic())
+                .filter(field -> !Modifier.isStatic(field.getModifiers()))
                 .collect(Collectors.toList());
         List<String> columnNames;
         if (fieldsToColumns == null) {
