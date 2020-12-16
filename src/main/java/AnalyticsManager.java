@@ -1,10 +1,9 @@
-import bsh.servlet.SimpleTemplate;
-
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
+
 
 public class AnalyticsManager {
     private final TransactionManager transactionManager;
@@ -14,40 +13,70 @@ public class AnalyticsManager {
     }
 
     public Account mostFrequentBeneficiaryOfAccount(Account account) {
-        Collection<Transaction> transactions = transactionManager.findAllTransactionsByAccount(account);
 
-        HashMap<Account, Integer> accountsAndFrequencies = new HashMap<>();
+        HashMap<Account, Integer> emptyMap = new HashMap<>();
 
-        for (Transaction transaction : transactions) {
-            if (transaction.getBeneficiary() != null && transaction.getAmount() > 0) {
-                Account beneficiary = transaction.getBeneficiary();
-                if (!accountsAndFrequencies.containsKey(beneficiary)) {
-                    accountsAndFrequencies.put(beneficiary, 1);
-                } else {
-                    int oldFrequency = accountsAndFrequencies.get(beneficiary);
-                    accountsAndFrequencies.put(beneficiary, oldFrequency + 1);
-                }
+        BiFunction<HashMap<Account, Integer>, Transaction, HashMap<Account, Integer>> accumulator =
+                (HashMap<Account, Integer> accountsAndFrequencies, Transaction transaction) -> {
+                    if (transaction.getBeneficiary() != null && transaction.getAmount() > 0) {
+                        Account beneficiary = transaction.getBeneficiary();
+                        if (!accountsAndFrequencies.containsKey(beneficiary)) {
+                            accountsAndFrequencies.put(beneficiary, 1);
+                        } else {
+                            int oldFrequency = accountsAndFrequencies.get(beneficiary);
+                            accountsAndFrequencies.put(beneficiary, oldFrequency + 1);
+                        }
 
-            }
-        }
+                    }
+                    return accountsAndFrequencies;
+                };
 
-        return accountsAndFrequencies.entrySet().stream().max(Comparator.comparingInt(Map.Entry::getValue)).get().getKey();
+        BinaryOperator<HashMap<Account, Integer>> combiner =
+                (HashMap<Account, Integer> dst, HashMap<Account, Integer> src) -> {
+                    src.entrySet().stream().peek((entry) -> {
+                        dst.put(entry.getKey(), entry.getValue());
+                    });
+                    return  dst;
+                };
+
+        return transactionManager
+                .findAllTransactionsByAccount(account)
+                .stream()
+                .reduce(emptyMap, accumulator, combiner)
+                .entrySet()
+                .stream()
+                .max(Comparator.comparingInt(Map.Entry::getValue))
+                .get().getKey();
     }
 
     public Collection<Transaction> topTenExpensivePurchases(Account account) {
+        TreeMap<Double, Transaction> emptyMap = new TreeMap<>();
+
+        BiFunction<TreeMap<Double, Transaction>, Transaction, TreeMap<Double, Transaction>> accumulator =
+                (TreeMap<Double, Transaction> purchases, Transaction transaction) -> {
+                    double amount = transaction.getAmount();
+                    if (amount > 0) {
+                        purchases.put(amount, transaction);
+                    }
+                    return purchases;
+                };
+
+        BinaryOperator<TreeMap<Double, Transaction>> combiner =
+                (TreeMap<Double, Transaction> dst, TreeMap<Double, Transaction> src) -> {
+                    src.entrySet().stream().peek((entry) -> {
+                        dst.put(entry.getKey(), entry.getValue());
+                    });
+                    return  dst;
+                };
 
         int requiredNumberOfTransactions = 10;
-        Collection<Transaction> transactions = transactionManager.findAllTransactionsByAccount(account);
 
-        TreeMap<Double, Transaction> purchases = new TreeMap<Double, Transaction>();
-        for(Transaction transaction : transactions) {
-            double amount = transaction.getAmount();
-            if (amount > 0) {
-                purchases.put(amount, transaction);
-            }
-        }
+        TreeMap<Double, Transaction> goods = transactionManager
+                .findAllTransactionsByAccount(account)
+                .stream()
+                .reduce(emptyMap, accumulator, combiner);
 
-        return purchases
+        return goods
                 .entrySet()
                 .stream()
                 .sorted((o1, o2) -> {
@@ -61,7 +90,7 @@ public class AnalyticsManager {
                     return 1; })
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList())
-                .subList(0, Math.min(requiredNumberOfTransactions, purchases.entrySet().size()));
+                .subList(0, Math.min(requiredNumberOfTransactions, goods.entrySet().size()));
     }
 
     public double overallBalanceOfAccounts(List<? extends Account> accounts) {
@@ -81,20 +110,21 @@ public class AnalyticsManager {
     }
 
     public List<Account> accountsRangeFrom(List<? extends Account> accounts, Account minAccount, Comparator<? super Account> comparator) {
-        ArrayList<Account> accs = accounts.stream().sorted(comparator).collect(Collectors.toCollection(ArrayList::new));
-        int lastIndex = accs.lastIndexOf(minAccount);
-        return accs.stream().skip(Math.max(lastIndex, 0)).collect(Collectors.toList());
+
+        return accounts
+                .stream()
+                .filter((acc) -> comparator.compare(acc, minAccount) >= 0)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public Optional<Entry> maxExpenseAmountEntryWithinInterval(List<Account> accounts, LocalDate from, LocalDate to) {
-        Function<Collection<Entry>, Stream<Entry>> apply = Collection::stream;
+
         return accounts
                 .stream()
+                .filter(Objects::nonNull)
                 .map((account) -> account.history(from, to))
-                .flatMap(apply)
+                .flatMap(Collection::stream)
                 .filter((item) -> item.getAmount() < 0)
                 .min(Comparator.comparingDouble(Entry::getAmount));
-
     }
-
 }
